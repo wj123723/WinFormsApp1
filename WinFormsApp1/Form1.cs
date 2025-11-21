@@ -137,6 +137,15 @@ namespace WinFormsApp1
                 return false;
             }
 
+            // 验证性别
+            string gender = txtGender.Text.Trim();
+            if (string.IsNullOrEmpty(gender))
+            {
+                MessageBox.Show("请输入性别", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                txtGender.Focus();
+                return false;
+            }
+
             return true;
         }
 
@@ -151,7 +160,9 @@ namespace WinFormsApp1
                 Name = txtName.Text.Trim(),
                 IdCardNumber = txtIdCard.Text.Trim(),
                 BankCardNumber = txtBankCard.Text.Trim(),
-                PhoneNumber = txtPhone.Text.Trim()
+                PhoneNumber = txtPhone.Text.Trim(),
+                Gender = txtGender.Text.Trim(),
+                BankName = txtBankName.Text.Trim()
             };
         }
 
@@ -167,6 +178,8 @@ namespace WinFormsApp1
                 txtIdCard.Text = personInfo.IdCardNumber;
                 txtBankCard.Text = personInfo.BankCardNumber;
                 txtPhone.Text = personInfo.PhoneNumber;
+                txtGender.Text = personInfo.Gender ?? string.Empty;
+                txtBankName.Text = personInfo.BankName ?? string.Empty;
                 _currentPersonInfo = personInfo;
             }
         }
@@ -180,6 +193,10 @@ namespace WinFormsApp1
             txtIdCard.Clear();
             txtBankCard.Clear();
             txtPhone.Clear();
+            txtGender.Clear();
+            txtBankName.Clear();
+            txtGender.Clear();
+            txtBankName.Clear();
             _currentPersonInfo = null;
             isEditMode = false;
             txtName.Focus();
@@ -312,7 +329,9 @@ namespace WinFormsApp1
                     p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                     p.IdCardNumber.Contains(searchText) ||
                     p.PhoneNumber.Contains(searchText) ||
-                    p.BankCardNumber.Contains(searchText)
+                    p.BankCardNumber.Contains(searchText) ||
+                    p.Gender.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    p.BankName.Contains(searchText, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
 
                 // 更新DataGridView

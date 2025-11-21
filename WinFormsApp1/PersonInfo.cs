@@ -28,6 +28,18 @@ namespace WinFormsApp1
         public string BankCardNumber { get; set; }
 
         /// <summary>
+        /// 性别
+        /// </summary>
+        [Required(ErrorMessage = "性别不能为空")]
+        public string Gender { get; set; }
+
+        /// <summary>
+        /// 银行名称
+        /// </summary>
+        [Required(ErrorMessage = "银行名称不能为空")]
+        public string BankName { get; set; }
+
+        /// <summary>
         /// 电话号码
         /// </summary>
         [Required(ErrorMessage = "电话号码不能为空")]
@@ -49,7 +61,7 @@ namespace WinFormsApp1
         /// <returns>人物信息字符串</returns>
         public override string ToString()
         {
-            return $"姓名: {Name}, 身份证: {IdCardNumber}, 银行卡: {BankCardNumber}, 电话: {PhoneNumber}";
+            return $"姓名: {Name}, 身份证: {IdCardNumber}, 银行卡: {BankCardNumber}, 电话: {PhoneNumber}, 性别: {Gender}, 银行名称: {BankName}";
         }
     }
 }

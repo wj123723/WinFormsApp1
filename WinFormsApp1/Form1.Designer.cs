@@ -35,17 +35,23 @@ namespace WinFormsApp1
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
+            label7 = new Label();
+            label8 = new Label();
             txtName = new TextBox();
             txtIdCard = new TextBox();
             txtBankCard = new TextBox();
             txtPhone = new TextBox();
+            txtGender = new TextBox();
+            txtBankName = new TextBox();
             btnAdd = new Button();
             btnEdit = new Button();
             btnDelete = new Button();
             btnClear = new Button();
             dgvPersonInfo = new DataGridView();
             NameColumn = new DataGridViewTextBoxColumn();
+            GenderColumn = new DataGridViewTextBoxColumn();
             IdCardColumn = new DataGridViewTextBoxColumn();
+            BankNameColumn = new DataGridViewTextBoxColumn();
             BankCardColumn = new DataGridViewTextBoxColumn();
             PhoneColumn = new DataGridViewTextBoxColumn();
             CreatedTimeColumn = new DataGridViewTextBoxColumn();
@@ -106,6 +112,26 @@ namespace WinFormsApp1
             label4.TabIndex = 3;
             label4.Text = "电话号码：";
             // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(12, 174);
+            label7.Margin = new Padding(2, 0, 2, 0);
+            label7.Name = "label7";
+            label7.Size = new Size(52, 17);
+            label7.TabIndex = 20;
+            label7.Text = "性  别：";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(12, 207);
+            label8.Margin = new Padding(2, 0, 2, 0);
+            label8.Name = "label8";
+            label8.Size = new Size(68, 17);
+            label8.TabIndex = 21;
+            label8.Text = "银行名称：";
+            // 
             // txtName
             // 
             txtName.Location = new Point(89, 39);
@@ -137,6 +163,22 @@ namespace WinFormsApp1
             txtPhone.Name = "txtPhone";
             txtPhone.Size = new Size(219, 23);
             txtPhone.TabIndex = 7;
+            // 
+            // txtGender
+            // 
+            txtGender.Location = new Point(89, 171);
+            txtGender.Margin = new Padding(2, 3, 2, 3);
+            txtGender.Name = "txtGender";
+            txtGender.Size = new Size(219, 23);
+            txtGender.TabIndex = 22;
+            // 
+            // txtBankName
+            // 
+            txtBankName.Location = new Point(89, 204);
+            txtBankName.Margin = new Padding(2, 3, 2, 3);
+            txtBankName.Name = "txtBankName";
+            txtBankName.Size = new Size(219, 23);
+            txtBankName.TabIndex = 23;
             // 
             // btnAdd
             // 
@@ -198,7 +240,7 @@ namespace WinFormsApp1
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             dgvPersonInfo.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvPersonInfo.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPersonInfo.Columns.AddRange(new DataGridViewColumn[] { NameColumn, IdCardColumn, BankCardColumn, PhoneColumn, CreatedTimeColumn, LastModifiedColumn });
+            dgvPersonInfo.Columns.AddRange(new DataGridViewColumn[] { NameColumn, GenderColumn, IdCardColumn, BankNameColumn, BankCardColumn, PhoneColumn, CreatedTimeColumn, LastModifiedColumn });
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = SystemColors.Window;
             dataGridViewCellStyle2.Font = new Font("Microsoft YaHei UI", 9F);
@@ -207,7 +249,7 @@ namespace WinFormsApp1
             dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
             dgvPersonInfo.DefaultCellStyle = dataGridViewCellStyle2;
-            dgvPersonInfo.Location = new Point(9, 241);
+            dgvPersonInfo.Location = new Point(9, 280);
             dgvPersonInfo.Margin = new Padding(2, 3, 2, 3);
             dgvPersonInfo.Name = "dgvPersonInfo";
             dgvPersonInfo.ReadOnly = true;
@@ -222,7 +264,7 @@ namespace WinFormsApp1
             dgvPersonInfo.RowHeadersWidth = 51;
             dgvPersonInfo.RowTemplate.Height = 29;
             dgvPersonInfo.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvPersonInfo.Size = new Size(863, 441);
+            dgvPersonInfo.Size = new Size(1275, 506);
             dgvPersonInfo.TabIndex = 12;
             dgvPersonInfo.CellClick += dgvPersonInfo_CellClick;
             // 
@@ -235,6 +277,15 @@ namespace WinFormsApp1
             NameColumn.ReadOnly = true;
             NameColumn.Width = 120;
             // 
+            // GenderColumn
+            // 
+            GenderColumn.DataPropertyName = "Gender";
+            GenderColumn.HeaderText = "性别";
+            GenderColumn.MinimumWidth = 6;
+            GenderColumn.Name = "GenderColumn";
+            GenderColumn.ReadOnly = true;
+            GenderColumn.Width = 80;
+            // 
             // IdCardColumn
             // 
             IdCardColumn.DataPropertyName = "IdCardNumber";
@@ -243,6 +294,15 @@ namespace WinFormsApp1
             IdCardColumn.Name = "IdCardColumn";
             IdCardColumn.ReadOnly = true;
             IdCardColumn.Width = 200;
+            // 
+            // BankNameColumn
+            // 
+            BankNameColumn.DataPropertyName = "BankName";
+            BankNameColumn.HeaderText = "银行名称";
+            BankNameColumn.MinimumWidth = 6;
+            BankNameColumn.Name = "BankNameColumn";
+            BankNameColumn.ReadOnly = true;
+            BankNameColumn.Width = 150;
             // 
             // BankCardColumn
             // 
@@ -284,10 +344,10 @@ namespace WinFormsApp1
             // 
             statusStrip1.ImageScalingSize = new Size(20, 20);
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 689);
+            statusStrip1.Location = new Point(0, 793);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new Padding(1, 0, 11, 0);
-            statusStrip1.Size = new Size(882, 22);
+            statusStrip1.Size = new Size(1294, 22);
             statusStrip1.TabIndex = 13;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -323,6 +383,10 @@ namespace WinFormsApp1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(label8);
+            panel1.Controls.Add(label7);
+            panel1.Controls.Add(txtBankName);
+            panel1.Controls.Add(txtGender);
             panel1.Controls.Add(label5);
             panel1.Controls.Add(btnImportExcel);
             panel1.Controls.Add(btnExportExcel);
@@ -342,7 +406,7 @@ namespace WinFormsApp1
             panel1.Location = new Point(9, 12);
             panel1.Margin = new Padding(2, 3, 2, 3);
             panel1.Name = "panel1";
-            panel1.Size = new Size(864, 191);
+            panel1.Size = new Size(1276, 230);
             panel1.TabIndex = 15;
             panel1.Paint += panel1_Paint;
             // 
@@ -374,10 +438,10 @@ namespace WinFormsApp1
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(txtSearch);
             panel2.Controls.Add(label6);
-            panel2.Location = new Point(9, 209);
+            panel2.Location = new Point(9, 248);
             panel2.Margin = new Padding(2, 3, 2, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(864, 26);
+            panel2.Size = new Size(1276, 26);
             panel2.TabIndex = 16;
             // 
             // txtSearch
@@ -402,7 +466,7 @@ namespace WinFormsApp1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(882, 711);
+            ClientSize = new Size(1294, 815);
             Controls.Add(panel2);
             Controls.Add(panel1);
             Controls.Add(statusStrip1);
@@ -423,17 +487,20 @@ namespace WinFormsApp1
             ResumeLayout(false);
             PerformLayout();
         }
-
         #endregion
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.TextBox txtIdCard;
         private System.Windows.Forms.TextBox txtBankCard;
         private System.Windows.Forms.TextBox txtPhone;
+        private System.Windows.Forms.TextBox txtGender;
+        private System.Windows.Forms.TextBox txtBankName;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Button btnEdit;
         private System.Windows.Forms.Button btnDelete;
@@ -441,7 +508,9 @@ namespace WinFormsApp1
         private System.Windows.Forms.Button btnExportExcel;
         private System.Windows.Forms.DataGridView dgvPersonInfo;
         private System.Windows.Forms.DataGridViewTextBoxColumn NameColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GenderColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdCardColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn BankNameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn BankCardColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn PhoneColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn CreatedTimeColumn;

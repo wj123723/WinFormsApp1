@@ -73,7 +73,18 @@ namespace WinFormsApp1
                 }
 
                 string jsonData = File.ReadAllText(_personFilePath);
-                return JsonSerializer.Deserialize<List<PersonInfo>>(jsonData, _jsonOptions) ?? new List<PersonInfo>();
+                var personList = JsonSerializer.Deserialize<List<PersonInfo>>(jsonData, _jsonOptions) ?? new List<PersonInfo>();
+                
+                // 确保所有PersonInfo对象的Gender和BankName属性都已初始化
+                foreach (var person in personList)
+                {
+                    if (person.Gender == null)
+                        person.Gender = string.Empty;
+                    if (person.BankName == null)
+                        person.BankName = string.Empty;
+                }
+                
+                return personList;
             }
             catch (Exception ex)
             {
@@ -205,15 +216,18 @@ namespace WinFormsApp1
 
                         try
                         {
-                            // 读取Excel中的数据（假设列顺序为：姓名、身份证号、银行卡号、电话号码）
+                            // 读取Excel中的数据（假设列顺序为：姓名、身份证号、银行卡号、电话号码、性别、银行名称）
                             string name = GetCellValue(row.GetCell(0));
                             string idCard = GetCellValue(row.GetCell(1));
                             string bankCard = GetCellValue(row.GetCell(2));
                             string phone = GetCellValue(row.GetCell(3));
+                            string gender = GetCellValue(row.GetCell(4));
+                            string bankName = GetCellValue(row.GetCell(5));
 
                             // 验证数据
                             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(idCard) || 
-                                string.IsNullOrEmpty(bankCard) || string.IsNullOrEmpty(phone))
+                                string.IsNullOrEmpty(bankCard) || string.IsNullOrEmpty(phone) ||
+                                string.IsNullOrEmpty(gender))
                             {
                                 errorCount++;
                                 continue;
@@ -226,6 +240,8 @@ namespace WinFormsApp1
                                 IdCardNumber = idCard.Trim(),
                                 BankCardNumber = bankCard.Trim(),
                                 PhoneNumber = phone.Trim(),
+                                Gender = gender.Trim(),
+                                BankName = bankName.Trim(),
                                 CreatedTime = DateTime.Now,
                                 LastModifiedTime = DateTime.Now
                             };
@@ -321,8 +337,10 @@ namespace WinFormsApp1
                 headerRow.CreateCell(1).SetCellValue("身份证号");
                 headerRow.CreateCell(2).SetCellValue("银行卡号");
                 headerRow.CreateCell(3).SetCellValue("电话号码");
-                headerRow.CreateCell(4).SetCellValue("创建时间");
-                headerRow.CreateCell(5).SetCellValue("最后修改时间");
+                headerRow.CreateCell(4).SetCellValue("性别");
+                headerRow.CreateCell(5).SetCellValue("银行名称");
+                headerRow.CreateCell(6).SetCellValue("创建时间");
+                headerRow.CreateCell(7).SetCellValue("最后修改时间");
                 
                 // 设置标题样式
                 ICellStyle headerStyle = workbook.CreateCellStyle();
@@ -330,7 +348,7 @@ namespace WinFormsApp1
                 font.Boldweight = (short)FontBoldWeight.Bold;
                 headerStyle.SetFont(font);
                 
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     headerRow.GetCell(i).CellStyle = headerStyle;
                     sheet.AutoSizeColumn(i);
@@ -345,8 +363,10 @@ namespace WinFormsApp1
                     row.CreateCell(1).SetCellValue(person.IdCardNumber);
                     row.CreateCell(2).SetCellValue(person.BankCardNumber);
                     row.CreateCell(3).SetCellValue(person.PhoneNumber);
-                    row.CreateCell(4).SetCellValue(person.CreatedTime.ToString("yyyy-MM-dd HH:mm:ss"));
-                    row.CreateCell(5).SetCellValue(person.LastModifiedTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                    row.CreateCell(4).SetCellValue(person.Gender);
+                    row.CreateCell(5).SetCellValue(person.BankName);
+                    row.CreateCell(6).SetCellValue(person.CreatedTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                    row.CreateCell(7).SetCellValue(person.LastModifiedTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 }
                 
                 // 调整列宽
@@ -356,6 +376,8 @@ namespace WinFormsApp1
                 sheet.AutoSizeColumn(3);
                 sheet.AutoSizeColumn(4);
                 sheet.AutoSizeColumn(5);
+                sheet.AutoSizeColumn(6);
+                sheet.AutoSizeColumn(7);
                 
                 // 保存文件
                 using (FileStream fs = new FileStream(filePath, FileMode.Create))
