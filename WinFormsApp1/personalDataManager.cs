@@ -746,7 +746,7 @@ namespace WinFormsApp1
                 currencyStyle.CloneStyleFrom(totalSalaryStyle);
                 IDrawing drawing = sheet.CreateDrawingPatriarch();
                 IDataFormat format = workbook.CreateDataFormat();
-                currencyStyle.DataFormat = format.GetFormat("#,##0.00");
+                currencyStyle.DataFormat = format.GetFormat("#,##0");
                 
                 // 填充数据
                 int rowIndex = 1;

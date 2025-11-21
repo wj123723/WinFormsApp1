@@ -87,7 +87,7 @@ namespace WinFormsApp1
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(664, 12);
+            this.btnSearch.Location = new System.Drawing.Point(664, 20);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(60, 30);
             this.btnSearch.TabIndex = 3;
@@ -97,7 +97,7 @@ namespace WinFormsApp1
             // 
             // btnResetFilter
             // 
-            this.btnResetFilter.Location = new System.Drawing.Point(730, 12);
+            this.btnResetFilter.Location = new System.Drawing.Point(730, 20);
             this.btnResetFilter.Name = "btnResetFilter";
             this.btnResetFilter.Size = new System.Drawing.Size(60, 30);
             this.btnResetFilter.TabIndex = 4;
@@ -128,7 +128,7 @@ namespace WinFormsApp1
             // 
             // datePickerStartDate
             // 
-            this.datePickerStartDate.Location = new System.Drawing.Point(224, 43);
+            this.datePickerStartDate.Location = new System.Drawing.Point(224, 80);
             this.datePickerStartDate.Name = "datePickerStartDate";
             this.datePickerStartDate.Size = new System.Drawing.Size(150, 20);
             this.datePickerStartDate.TabIndex = 8;
@@ -136,7 +136,7 @@ namespace WinFormsApp1
             // 
             // datePickerEndDate
             // 
-            this.datePickerEndDate.Location = new System.Drawing.Point(424, 43);
+            this.datePickerEndDate.Location = new System.Drawing.Point(424, 80);
             this.datePickerEndDate.Name = "datePickerEndDate";
             this.datePickerEndDate.Size = new System.Drawing.Size(150, 20);
             this.datePickerEndDate.TabIndex = 9;
@@ -172,7 +172,7 @@ namespace WinFormsApp1
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(221, 27);
+            this.label4.Location = new System.Drawing.Point(221, 64);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(65, 13);
             this.label4.TabIndex = 13;
@@ -181,7 +181,7 @@ namespace WinFormsApp1
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(421, 27);
+            this.label5.Location = new System.Drawing.Point(421, 64);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(65, 13);
             this.label5.TabIndex = 14;
@@ -204,27 +204,28 @@ namespace WinFormsApp1
             this.panel1.Controls.Add(this.btnExportExcel);
             this.panel1.Controls.Add(this.btnImportExcel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Location = new System.Drawing.Point(0, 100);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(800, 70);
+            this.panel1.Size = new System.Drawing.Size(800, 120);
             this.panel1.TabIndex = 15;
             // 
             // panel2
             // 
             this.panel2.Controls.Add(this.dgvSalary);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 70);
+            this.panel2.Location = new System.Drawing.Point(0, 220);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(800, 400);
+            this.panel2.Size = new System.Drawing.Size(800, 230);
             this.panel2.TabIndex = 16;
             // 
             // SalaryForm
             // 
-            this.ClientSize = new System.Drawing.Size(800, 470);
+            this.ClientSize = new System.Drawing.Size(800, 600);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Name = "SalaryForm";
             this.Text = "薪资信息管理";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.SalaryForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSalary)).EndInit();
             this.panel1.ResumeLayout(false);
@@ -254,12 +255,12 @@ namespace WinFormsApp1
             // 添加列
             dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "姓名", FillWeight = 100 });
             dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Month", HeaderText = "月份", FillWeight = 80 });
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SalaryAmount", HeaderText = "当月工资金额", FillWeight = 100, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N2" } });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SalaryAmount", HeaderText = "当月工资金额", FillWeight = 100, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N0" } });
             dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "PayrollUnit", HeaderText = "发放单位", FillWeight = 120 });
             dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CreateTime", HeaderText = "制表时间", FillWeight = 150, DefaultCellStyle = new DataGridViewCellStyle() { Format = "yyyy-MM-dd HH:mm:ss" } });
             dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "PaymentTime", HeaderText = "发放时间", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "yyyy-MM-dd" } });
             // 添加发放总金额列
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "TotalSalary", HeaderText = "发放总金额", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N2", BackColor = Color.LightYellow } });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "TotalSalary", HeaderText = "发放总金额", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N0", BackColor = Color.LightYellow } });
         }
 
         private void LoadSalaryData()
