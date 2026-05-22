@@ -20,6 +20,8 @@ namespace WinFormsApp1
         // 搜索相关字段
         private List<PersonInfo> personList;
         private bool isEditMode = false;
+        // 模板文件路径
+        private string _templateFilePath = string.Empty;
 
         public Form1()
         {
@@ -35,6 +37,9 @@ namespace WinFormsApp1
 
             // 添加搜索文本框的事件处理程序
             txtSearch.TextChanged += TxtSearch_TextChanged;
+
+            // 禁用导入Excel按钮，直到生成模板
+            btnImportExcel.Enabled = false;
 
             // 添加薪资管理按钮
             AddSalaryManagementButton();
@@ -361,39 +366,28 @@ namespace WinFormsApp1
         /// <param name="e"></param>
         private void btnImportExcel_Click(object sender, EventArgs e)
         {
-            // 创建文件选择对话框
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            if (string.IsNullOrEmpty(_templateFilePath) || !File.Exists(_templateFilePath))
             {
-                Title = "选择Excel文件",
-                Filter = "Excel文件 (*.xlsx)|*.xlsx|所有文件 (*.*)|*.*",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                Multiselect = false
-            };
+                MessageBox.Show("模板文件不存在，请先生成模板！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-            // 显示对话框并检查用户是否点击了确定
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            try
             {
-                try
-                {
-                    // 显示导入中的提示
-                    toolStripStatusLabel1.Text = "正在导入数据...";
-                    Application.DoEvents();
+                toolStripStatusLabel1.Text = "正在导入数据...";
+                Application.DoEvents();
 
-                    // 调用DataManager的导入方法
-                    string result = _dataManager.ImportFromExcel(openFileDialog.FileName);
+                string result = _dataManager.ImportFromExcel(_templateFilePath);
 
-                    // 重新加载数据
-                    LoadPersonData();
+                LoadPersonData();
 
-                    // 显示导入结果
-                    MessageBox.Show(result, "导入结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    toolStripStatusLabel1.Text = $"就绪 - {dgvPersonInfo.Rows.Count} 条记录";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("导入失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    toolStripStatusLabel1.Text = $"就绪 - {dgvPersonInfo.Rows.Count} 条记录";
-                }
+                MessageBox.Show(result, "导入结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                toolStripStatusLabel1.Text = $"就绪 - {dgvPersonInfo.Rows.Count} 条记录";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("导入失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                toolStripStatusLabel1.Text = $"就绪 - {dgvPersonInfo.Rows.Count} 条记录";
             }
         }
 
@@ -447,6 +441,145 @@ namespace WinFormsApp1
                 {
                     MessageBox.Show("导出失败，请检查并重试", "导出失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        private void btnGenerateTemplate_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "Excel文件|*.xlsx";
+                saveFileDialog.Title = "保存模板文件";
+                saveFileDialog.FileName = "个人信息模板.xlsx";
+                saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    
+                    GenerateExcelTemplate(filePath);
+                    
+                    _templateFilePath = filePath;
+                    btnImportExcel.Enabled = true;
+                    
+                    MessageBox.Show("模板文件已生成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = filePath,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("无法打开文件: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("生成模板失败: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void GenerateExcelTemplate(string filePath)
+        {
+            try
+            {
+                NPOI.XSSF.UserModel.XSSFWorkbook workbook = new NPOI.XSSF.UserModel.XSSFWorkbook();
+                
+                NPOI.SS.UserModel.ISheet sheet = workbook.CreateSheet("个人信息模板");
+                
+                NPOI.SS.UserModel.IRow headerRow = sheet.CreateRow(0);
+                headerRow.CreateCell(0).SetCellValue("姓名");
+                headerRow.CreateCell(1).SetCellValue("身份证号");
+                headerRow.CreateCell(2).SetCellValue("银行卡号");
+                headerRow.CreateCell(3).SetCellValue("电话号码");
+                headerRow.CreateCell(4).SetCellValue("性别");
+                headerRow.CreateCell(5).SetCellValue("银行名称");
+                
+                NPOI.SS.UserModel.ICellStyle headerStyle = workbook.CreateCellStyle();
+                NPOI.SS.UserModel.IFont font = workbook.CreateFont();
+                font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+                headerStyle.SetFont(font);
+                headerStyle.FillForegroundColor = NPOI.SS.UserModel.IndexedColors.Grey25Percent.Index;
+                headerStyle.FillPattern = NPOI.SS.UserModel.FillPattern.SolidForeground;
+                
+                for (int i = 0; i < 6; i++)
+                {
+                    headerRow.GetCell(i).CellStyle = headerStyle;
+                }
+                
+                sheet.SetColumnWidth(0, 15 * 256);
+                sheet.SetColumnWidth(1, 22 * 256);
+                sheet.SetColumnWidth(2, 22 * 256);
+                sheet.SetColumnWidth(3, 15 * 256);
+                sheet.SetColumnWidth(4, 8 * 256);
+                sheet.SetColumnWidth(5, 20 * 256);
+                
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    workbook.Write(fileStream, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("生成Excel模板失败: " + ex.Message, ex);
+            }
+        }
+
+        private void btnCheckInfo_Click(object sender, EventArgs e)
+        {
+            if (personList == null || personList.Count == 0)
+            {
+                MessageBox.Show("没有个人信息数据可供检查！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            List<string> errorMessages = new List<string>();
+            int errorCount = 0;
+            int checkedCount = 0;
+
+            foreach (var person in personList)
+            {
+                checkedCount++;
+                List<string> personErrors = new List<string>();
+
+                if (!ValidationHelper.ValidateIdCardNumber(person.IdCardNumber))
+                {
+                    personErrors.Add($"身份证号码格式错误（应为18位）: {person.IdCardNumber}");
+                }
+
+                if (!ValidationHelper.ValidateBankCardNumber(person.BankCardNumber))
+                {
+                    personErrors.Add($"银行卡号码格式错误（应为13-19位数字）: {person.BankCardNumber}");
+                }
+
+                if (!ValidationHelper.ValidatePhoneNumber(person.PhoneNumber))
+                {
+                    personErrors.Add($"电话号码格式错误（应为11位且以1开头）: {person.PhoneNumber}");
+                }
+
+                if (personErrors.Count > 0)
+                {
+                    errorCount++;
+                    errorMessages.Add($"【{person.Name}】:\n  {string.Join("\n  ", personErrors)}");
+                }
+            }
+
+            if (errorCount == 0)
+            {
+                MessageBox.Show($"检查完成！\n共检查 {checkedCount} 条记录，全部格式正确。", "检查结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                string resultMessage = $"检查完成！\n共检查 {checkedCount} 条记录，发现 {errorCount} 条记录有误：\n\n";
+                resultMessage += string.Join("\n\n", errorMessages);
+                
+                MessageBox.Show(resultMessage, "检查结果", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

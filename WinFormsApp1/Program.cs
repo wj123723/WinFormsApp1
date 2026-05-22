@@ -24,6 +24,7 @@ namespace WinFormsApp1
     public partial class SalaryForm : Form
     {
         private SalaryDataManager _salaryDataManager;
+        private string _templateFilePath = string.Empty;
 
         public SalaryForm()
         {
@@ -36,11 +37,13 @@ namespace WinFormsApp1
             this.dgvSalary = new System.Windows.Forms.DataGridView();
             this.btnImportExcel = new System.Windows.Forms.Button();
             this.btnExportExcel = new System.Windows.Forms.Button();
+            this.btnGenerateTemplate = new System.Windows.Forms.Button();
             this.btnSearch = new System.Windows.Forms.Button();
             this.btnResetFilter = new System.Windows.Forms.Button();
-            this.txtNameFilter = new System.Windows.Forms.TextBox();
-            this.txtUnitFilter = new System.Windows.Forms.TextBox();
-            this.txtMonthFilter = new System.Windows.Forms.TextBox();
+            this.btnClearConditions = new System.Windows.Forms.Button();
+            this.txtNameFilter = new System.Windows.Forms.ComboBox();
+            this.txtUnitFilter = new System.Windows.Forms.ComboBox();
+            this.txtMonthFilter = new System.Windows.Forms.ComboBox();
             this.datePickerStartDate = new System.Windows.Forms.DateTimePicker();
             this.datePickerEndDate = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
@@ -84,6 +87,13 @@ namespace WinFormsApp1
             this.btnExportExcel.Text = "导出Excel";
             this.btnExportExcel.UseVisualStyleBackColor = true;
             this.btnExportExcel.Click += new System.EventHandler(this.btnExportExcel_Click);
+            this.btnGenerateTemplate.Location = new System.Drawing.Point(12, 48);
+            this.btnGenerateTemplate.Name = "btnGenerateTemplate";
+            this.btnGenerateTemplate.Size = new System.Drawing.Size(100, 30);
+            this.btnGenerateTemplate.TabIndex = 8;
+            this.btnGenerateTemplate.Text = "生成模板";
+            this.btnGenerateTemplate.UseVisualStyleBackColor = true;
+            this.btnGenerateTemplate.Click += new System.EventHandler(this.btnGenerateTemplate_Click);
             // 
             // btnSearch
             // 
@@ -104,27 +114,43 @@ namespace WinFormsApp1
             this.btnResetFilter.Text = "重置";
             this.btnResetFilter.UseVisualStyleBackColor = true;
             this.btnResetFilter.Click += new System.EventHandler(this.btnResetFilter_Click);
+            this.btnClearConditions.Location = new System.Drawing.Point(118, 48);
+            this.btnClearConditions.Name = "btnClearConditions";
+            this.btnClearConditions.Size = new System.Drawing.Size(100, 30);
+            this.btnClearConditions.TabIndex = 9;
+            this.btnClearConditions.Text = "清除条件";
+            this.btnClearConditions.UseVisualStyleBackColor = true;
+            this.btnClearConditions.Click += new System.EventHandler(this.btnClearConditions_Click);
             // 
             // txtNameFilter
             // 
             this.txtNameFilter.Location = new System.Drawing.Point(224, 17);
             this.txtNameFilter.Name = "txtNameFilter";
-            this.txtNameFilter.Size = new System.Drawing.Size(100, 20);
+            this.txtNameFilter.Size = new System.Drawing.Size(100, 21);
             this.txtNameFilter.TabIndex = 5;
+            this.txtNameFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+            this.txtNameFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtNameFilter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             // 
             // txtUnitFilter
             // 
             this.txtUnitFilter.Location = new System.Drawing.Point(374, 17);
             this.txtUnitFilter.Name = "txtUnitFilter";
-            this.txtUnitFilter.Size = new System.Drawing.Size(100, 20);
+            this.txtUnitFilter.Size = new System.Drawing.Size(100, 21);
             this.txtUnitFilter.TabIndex = 6;
+            this.txtUnitFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+            this.txtUnitFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtUnitFilter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             // 
             // txtMonthFilter
             // 
             this.txtMonthFilter.Location = new System.Drawing.Point(524, 17);
             this.txtMonthFilter.Name = "txtMonthFilter";
-            this.txtMonthFilter.Size = new System.Drawing.Size(70, 20);
+            this.txtMonthFilter.Size = new System.Drawing.Size(70, 21);
             this.txtMonthFilter.TabIndex = 7;
+            this.txtMonthFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+            this.txtMonthFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtMonthFilter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             // 
             // datePickerStartDate
             // 
@@ -201,8 +227,10 @@ namespace WinFormsApp1
             this.panel1.Controls.Add(this.txtNameFilter);
             this.panel1.Controls.Add(this.btnResetFilter);
             this.panel1.Controls.Add(this.btnSearch);
+            this.panel1.Controls.Add(this.btnClearConditions);
             this.panel1.Controls.Add(this.btnExportExcel);
             this.panel1.Controls.Add(this.btnImportExcel);
+            this.panel1.Controls.Add(this.btnGenerateTemplate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 100);
             this.panel1.Name = "panel1";
@@ -236,10 +264,9 @@ namespace WinFormsApp1
 
         private void SalaryForm_Load(object sender, EventArgs e)
         {
-            // 初始化DataGridView
             InitializeDataGridView();
-            // 加载薪资数据
             LoadSalaryData();
+            btnImportExcel.Enabled = false;
         }
 
         private void InitializeDataGridView()
@@ -268,8 +295,8 @@ namespace WinFormsApp1
             try
             {
                 var salaryList = _salaryDataManager.LoadSalaryData();
-                // 显示薪资数据并计算发放总金额
                 DisplaySalaryDataWithTotals(salaryList);
+                PopulateComboBoxes(salaryList);
             }
             catch (Exception ex)
             {
@@ -277,25 +304,52 @@ namespace WinFormsApp1
             }
         }
 
+        private void PopulateComboBoxes(List<SalaryInfo> salaryList)
+        {
+            txtNameFilter.Items.Clear();
+            txtUnitFilter.Items.Clear();
+            txtMonthFilter.Items.Clear();
+
+            txtNameFilter.Items.Add("");
+            txtUnitFilter.Items.Add("");
+            txtMonthFilter.Items.Add("");
+
+            var names = salaryList.Select(s => s.Name).Distinct().OrderBy(n => n).ToList();
+            foreach (var name in names)
+            {
+                txtNameFilter.Items.Add(name);
+            }
+
+            var units = salaryList.Select(s => s.PayrollUnit).Distinct().OrderBy(u => u).ToList();
+            foreach (var unit in units)
+            {
+                txtUnitFilter.Items.Add(unit);
+            }
+
+            var months = salaryList.Select(s => s.Month).Distinct().OrderBy(m => m).ToList();
+            foreach (var month in months)
+            {
+                txtMonthFilter.Items.Add(month);
+            }
+        }
+
         private void btnImportExcel_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Excel文件|*.xlsx";
-            openFileDialog.Title = "选择Excel文件";
-            
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (string.IsNullOrEmpty(_templateFilePath) || !File.Exists(_templateFilePath))
             {
-                try
-                {
-                    string result = _salaryDataManager.ImportSalaryFromExcel(openFileDialog.FileName);
-                    MessageBox.Show(result, "导入结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    // 重新加载数据
-                    LoadSalaryData();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("导入失败: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show("模板文件不存在，请先生成模板！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                string result = _salaryDataManager.ImportSalaryFromExcel(_templateFilePath);
+                MessageBox.Show(result, "导入结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadSalaryData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("导入失败: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -416,25 +470,119 @@ namespace WinFormsApp1
         
         private void btnResetFilter_Click(object sender, EventArgs e)
         {
-            // 重置筛选条件
             txtNameFilter.Text = "";
             txtUnitFilter.Text = "";
             txtMonthFilter.Text = "";
             datePickerStartDate.Checked = false;
             datePickerEndDate.Checked = false;
             
-            // 重新加载所有数据
             LoadSalaryData();
+        }
+
+        private void btnClearConditions_Click(object sender, EventArgs e)
+        {
+            txtNameFilter.Text = "";
+            txtUnitFilter.Text = "";
+            txtMonthFilter.Text = "";
+            
+            btnSearch_Click(sender, e);
+        }
+
+        private void btnGenerateTemplate_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "Excel文件|*.xlsx";
+                saveFileDialog.Title = "保存薪资模板文件";
+                saveFileDialog.FileName = "薪资信息模板.xlsx";
+                saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    
+                    GenerateSalaryExcelTemplate(filePath);
+                    
+                    _templateFilePath = filePath;
+                    btnImportExcel.Enabled = true;
+                    
+                    MessageBox.Show("薪资模板文件已生成！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = filePath,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("无法打开文件: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("生成模板失败: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void GenerateSalaryExcelTemplate(string filePath)
+        {
+            try
+            {
+                NPOI.XSSF.UserModel.XSSFWorkbook workbook = new NPOI.XSSF.UserModel.XSSFWorkbook();
+                
+                NPOI.SS.UserModel.ISheet sheet = workbook.CreateSheet("薪资信息模板");
+                
+                NPOI.SS.UserModel.IRow headerRow = sheet.CreateRow(0);
+                headerRow.CreateCell(0).SetCellValue("姓名");
+                headerRow.CreateCell(1).SetCellValue("月份");
+                headerRow.CreateCell(2).SetCellValue("工资金额");
+                headerRow.CreateCell(3).SetCellValue("发放单位");
+                headerRow.CreateCell(4).SetCellValue("发放时间");
+                
+                NPOI.SS.UserModel.ICellStyle headerStyle = workbook.CreateCellStyle();
+                NPOI.SS.UserModel.IFont font = workbook.CreateFont();
+                font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+                headerStyle.SetFont(font);
+                headerStyle.FillForegroundColor = NPOI.SS.UserModel.IndexedColors.Grey25Percent.Index;
+                headerStyle.FillPattern = NPOI.SS.UserModel.FillPattern.SolidForeground;
+                
+                for (int i = 0; i < 5; i++)
+                {
+                    headerRow.GetCell(i).CellStyle = headerStyle;
+                }
+                
+                sheet.SetColumnWidth(0, 15 * 256);
+                sheet.SetColumnWidth(1, 12 * 256);
+                sheet.SetColumnWidth(2, 15 * 256);
+                sheet.SetColumnWidth(3, 20 * 256);
+                sheet.SetColumnWidth(4, 18 * 256);
+                
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    workbook.Write(fileStream, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("生成薪资Excel模板失败: " + ex.Message, ex);
+            }
         }
 
         private System.Windows.Forms.DataGridView dgvSalary;
         private System.Windows.Forms.Button btnImportExcel;
         private System.Windows.Forms.Button btnExportExcel;
+        private System.Windows.Forms.Button btnGenerateTemplate;
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.Button btnResetFilter;
-        private System.Windows.Forms.TextBox txtNameFilter;
-        private System.Windows.Forms.TextBox txtUnitFilter;
-        private System.Windows.Forms.TextBox txtMonthFilter;
+        private System.Windows.Forms.Button btnClearConditions;
+        private System.Windows.Forms.ComboBox txtNameFilter;
+        private System.Windows.Forms.ComboBox txtUnitFilter;
+        private System.Windows.Forms.ComboBox txtMonthFilter;
         private System.Windows.Forms.DateTimePicker datePickerStartDate;
         private System.Windows.Forms.DateTimePicker datePickerEndDate;
         private System.Windows.Forms.Label label1;

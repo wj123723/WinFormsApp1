@@ -63,6 +63,8 @@ namespace WinFormsApp1
             panel1 = new Panel();
             label5 = new Label();
             btnExportExcel = new Button();
+            btnGenerateTemplate = new Button();
+            btnCheckInfo = new Button();
             panel2 = new Panel();
             txtSearch = new TextBox();
             label6 = new Label();
@@ -390,6 +392,8 @@ namespace WinFormsApp1
             panel1.Controls.Add(label5);
             panel1.Controls.Add(btnImportExcel);
             panel1.Controls.Add(btnExportExcel);
+            panel1.Controls.Add(btnGenerateTemplate);
+            panel1.Controls.Add(btnCheckInfo);
             panel1.Controls.Add(btnSave);
             panel1.Controls.Add(label1);
             panel1.Controls.Add(btnClear);
@@ -431,6 +435,22 @@ namespace WinFormsApp1
             btnExportExcel.Text = "个人信息导出Excel";
             btnExportExcel.UseVisualStyleBackColor = true;
             btnExportExcel.Click += btnExportExcel_Click;
+            btnGenerateTemplate.Location = new Point(419, 147);
+            btnGenerateTemplate.Margin = new Padding(2, 3, 2, 3);
+            btnGenerateTemplate.Name = "btnGenerateTemplate";
+            btnGenerateTemplate.Size = new Size(135, 30);
+            btnGenerateTemplate.TabIndex = 17;
+            btnGenerateTemplate.Text = "生成模板";
+            btnGenerateTemplate.UseVisualStyleBackColor = true;
+            btnGenerateTemplate.Click += btnGenerateTemplate_Click;
+            btnCheckInfo.Location = new Point(419, 183);
+            btnCheckInfo.Margin = new Padding(2, 3, 2, 3);
+            btnCheckInfo.Name = "btnCheckInfo";
+            btnCheckInfo.Size = new Size(135, 30);
+            btnCheckInfo.TabIndex = 18;
+            btnCheckInfo.Text = "检查信息";
+            btnCheckInfo.UseVisualStyleBackColor = true;
+            btnCheckInfo.Click += btnCheckInfo_Click;
             // 
             // panel2
             // 
@@ -524,5 +544,7 @@ namespace WinFormsApp1
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button btnGenerateTemplate;
+        private System.Windows.Forms.Button btnCheckInfo;
     }
 }
