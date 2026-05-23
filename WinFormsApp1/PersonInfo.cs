@@ -9,9 +9,9 @@ namespace WinFormsApp1
     /// </summary>
     public class PersonInfo
     {
-        /// <summary>
-        /// 姓名
-        /// </summary>
+        [JsonIgnore]
+        public bool IsSelected { get; set; } = false;
+
         [Required(ErrorMessage = "姓名不能为空")]
         public string Name { get; set; }
 

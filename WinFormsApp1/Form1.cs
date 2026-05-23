@@ -27,43 +27,135 @@ namespace WinFormsApp1
         {
             InitializeComponent();
             _currentPersonInfo = null;
+            
+            try
+            {
+                string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico");
+                if (System.IO.File.Exists(iconPath))
+                {
+                    this.Icon = new Icon(iconPath);
+                }
+            }
+            catch
+            {
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // 加载数据到DataGridView
             _dataManager = new personalDataManager();
             LoadPersonData();
 
-            // 添加搜索文本框的事件处理程序
+            _dataManager.SyncSalaryToIncomeRecords();
+
             txtSearch.TextChanged += TxtSearch_TextChanged;
 
-            // 禁用导入Excel按钮，直到生成模板
             btnImportExcel.Enabled = false;
 
-            // 添加薪资管理按钮
+            dgvPersonInfo.CellValueChanged += dgvPersonInfo_CellValueChanged;
+            dgvPersonInfo.CurrentCellDirtyStateChanged += dgvPersonInfo_CurrentCellDirtyStateChanged;
+            dgvPersonInfo.CellMouseClick += dgvPersonInfo_CellMouseClick;
+            dgvPersonInfo.RowPrePaint += dgvPersonInfo_RowPrePaint;
+            dgvPersonInfo.CellDoubleClick += dgvPersonInfo_CellDoubleClick;
+
             AddSalaryManagementButton();
+        }
+
+        private void dgvPersonInfo_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvPersonInfo.Rows[e.RowIndex];
+                if (row.DataBoundItem is PersonInfo person)
+                {
+                    using (PersonalIncomeForm incomeForm = new PersonalIncomeForm(person.Name))
+                    {
+                        incomeForm.ShowDialog();
+                    }
+                }
+            }
+        }
+
+        private void dgvPersonInfo_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvPersonInfo.Rows[e.RowIndex];
+                if (row.DataBoundItem is PersonInfo person)
+                {
+                    if (person.IsSelected)
+                    {
+                        row.DefaultCellStyle.BackColor = Color.LightBlue;
+                    }
+                    else
+                    {
+                        row.DefaultCellStyle.BackColor = dgvPersonInfo.DefaultCellStyle.BackColor;
+                    }
+                }
+            }
+        }
+
+        private void dgvPersonInfo_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvPersonInfo.Rows[e.RowIndex];
+                if (row.DataBoundItem is PersonInfo person)
+                {
+                    person.IsSelected = !person.IsSelected;
+                    dgvPersonInfo.InvalidateRow(e.RowIndex);
+                    UpdateSelectedCount();
+                }
+            }
+        }
+
+        private void dgvPersonInfo_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvPersonInfo.CurrentCell is DataGridViewCheckBoxCell)
+            {
+                dgvPersonInfo.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        private void dgvPersonInfo_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 0 && e.RowIndex >= 0)
+            {
+                UpdateSelectedCount();
+            }
+        }
+
+        private void UpdateSelectedCount()
+        {
+            int selectedCount = 0;
+            foreach (DataGridViewRow row in dgvPersonInfo.Rows)
+            {
+                if (row.DataBoundItem is PersonInfo person && person.IsSelected)
+                {
+                    selectedCount++;
+                }
+            }
+            
+            int totalCount = dgvPersonInfo.Rows.Count;
+            toolStripStatusLabel1.Text = $"就绪 - 总计 {totalCount} 条记录，已选中 {selectedCount} 条";
         }
 
         private void AddSalaryManagementButton()
         {
-            // 创建薪资管理按钮
             Button btnSalaryManagement = new Button
             {
                 Text = "薪资管理",
                 Size = new Size(100, 40),
-                Location = new Point(10, 10), // 使用固定位置，确保可见
+                Location = new Point(10, 10),
                 BackColor = Color.LightBlue,
                 ForeColor = Color.Black,
                 Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold)
             };
             
-            // 添加点击事件
             btnSalaryManagement.Click += (sender, e) =>
             {
                 try
                 {
-                    // 打开薪资管理窗体
                     SalaryForm salaryForm = new SalaryForm();
                     salaryForm.ShowDialog();
                 }
@@ -73,12 +165,150 @@ namespace WinFormsApp1
                 }
             };
             
-            // 将按钮添加到窗体并调用BringToFront方法确保在最上层
             this.Controls.Add(btnSalaryManagement);
-            btnSalaryManagement.BringToFront(); // 作为方法调用而不是属性设置
+            btnSalaryManagement.BringToFront();
             
-            // 调试信息
+            Button btnDataMigration = new Button
+            {
+                Text = "数据迁移",
+                Size = new Size(100, 40),
+                Location = new Point(120, 10),
+                BackColor = Color.LightGreen,
+                ForeColor = Color.Black,
+                Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold)
+            };
+            
+            btnDataMigration.Click += (sender, e) =>
+            {
+                using (Form migrationForm = new Form())
+                {
+                    migrationForm.Text = "数据迁移同步";
+                    migrationForm.Size = new Size(500, 300);
+                    migrationForm.StartPosition = FormStartPosition.CenterParent;
+                    migrationForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+                    migrationForm.MaximizeBox = false;
+                    migrationForm.MinimizeBox = false;
+
+                    Button btnExport = new Button
+                    {
+                        Text = "导出数据",
+                        Location = new Point(50, 50),
+                        Size = new Size(180, 40),
+                        Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Bold)
+                    };
+
+                    Button btnImport = new Button
+                    {
+                        Text = "导入数据",
+                        Location = new Point(260, 50),
+                        Size = new Size(180, 40),
+                        Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Bold)
+                    };
+
+                    Label lblDescription = new Label
+                    {
+                        Text = "数据迁移功能说明：\n\n" +
+                               "• 导出数据：将所有数据（个人信息+薪资信息）导出到一个文件\n" +
+                               "• 导入数据：从导出文件中恢复数据到本机\n" +
+                               "• 支持覆盖导入或合并导入两种模式\n" +
+                               "• 可用于多台电脑之间的数据同步",
+                        Location = new Point(50, 120),
+                        Size = new Size(390, 120),
+                        Font = new Font("Microsoft YaHei UI", 9F)
+                    };
+
+                    btnExport.Click += (s, args) =>
+                    {
+                        try
+                        {
+                            SaveFileDialog saveDialog = new SaveFileDialog
+                            {
+                                Filter = "数据迁移文件|*.wddata",
+                                Title = "导出数据",
+                                FileName = $"WorkData_{DateTime.Now:yyyyMMdd_HHmmss}.wddata",
+                                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                            };
+
+                            if (saveDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                DataMigration migration = new DataMigration();
+                                string result = migration.ExportData(saveDialog.FileName);
+                                MessageBox.Show(result, "导出成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                migrationForm.Close();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "导出失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    };
+
+                    btnImport.Click += (s, args) =>
+                    {
+                        try
+                        {
+                            OpenFileDialog openDialog = new OpenFileDialog
+                            {
+                                Filter = "数据迁移文件|*.wddata",
+                                Title = "导入数据",
+                                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                            };
+
+                            if (openDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                DataMigration migration = new DataMigration();
+                                var preview = migration.PreviewImportData(openDialog.FileName);
+
+                                string previewMessage = $"即将导入的数据：\n\n" +
+                                                       $"文件版本：{preview.Version}\n" +
+                                                       $"导出时间：{preview.ExportTime:yyyy-MM-dd HH:mm:ss}\n" +
+                                                       $"个人信息：{preview.PersonInfoCount} 条\n" +
+                                                       $"薪资信息：{preview.SalaryInfoCount} 条\n\n" +
+                                                       $"请选择导入方式：";
+
+                                DialogResult result = MessageBox.Show(
+                                    previewMessage + "\n\n点击\"是\"覆盖现有数据\n点击\"否\"合并到现有数据\n点击\"取消\"放弃导入",
+                                    "导入预览",
+                                    MessageBoxButtons.YesNoCancel,
+                                    MessageBoxIcon.Question);
+
+                                if (result == DialogResult.Yes)
+                                {
+                                    string importResult = migration.ImportData(openDialog.FileName, true);
+                                    MessageBox.Show(importResult, "导入成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    
+                                    LoadPersonData();
+                                    migrationForm.Close();
+                                }
+                                else if (result == DialogResult.No)
+                                {
+                                    string importResult = migration.ImportData(openDialog.FileName, false);
+                                    MessageBox.Show(importResult, "导入成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    
+                                    LoadPersonData();
+                                    migrationForm.Close();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "导入失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    };
+
+                    migrationForm.Controls.Add(btnExport);
+                    migrationForm.Controls.Add(btnImport);
+                    migrationForm.Controls.Add(lblDescription);
+
+                    migrationForm.ShowDialog();
+                }
+            };
+            
+            this.Controls.Add(btnDataMigration);
+            btnDataMigration.BringToFront();
+            
             Console.WriteLine($"薪资管理按钮已添加，位置: {btnSalaryManagement.Location}");
+            Console.WriteLine($"数据迁移按钮已添加，位置: {btnDataMigration.Location}");
         }
 
         /// <summary>
@@ -91,8 +321,7 @@ namespace WinFormsApp1
                 personList = _dataManager.LoadData();
                 UpdateDataGridView(personList);
 
-                // 更新状态栏信息
-                toolStripStatusLabel1.Text = $"就绪 - {personList.Count} 条记录";
+                UpdateSelectedCount();
             }
             catch (Exception ex)
             {
@@ -339,10 +568,8 @@ namespace WinFormsApp1
                     p.BankName.Contains(searchText, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
 
-                // 更新DataGridView
                 UpdateDataGridView(filteredList);
-                // 更新状态栏信息
-                toolStripStatusLabel1.Text = $"就绪 - {filteredList.Count} 条记录";
+                UpdateSelectedCount();
             }
         }
 
@@ -382,20 +609,28 @@ namespace WinFormsApp1
                 LoadPersonData();
 
                 MessageBox.Show(result, "导入结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                toolStripStatusLabel1.Text = $"就绪 - {dgvPersonInfo.Rows.Count} 条记录";
             }
             catch (Exception ex)
             {
                 MessageBox.Show("导入失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                toolStripStatusLabel1.Text = $"就绪 - {dgvPersonInfo.Rows.Count} 条记录";
+                UpdateSelectedCount();
             }
         }
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {
-            if (dgvPersonInfo.SelectedRows.Count == 0)
+            List<PersonInfo> selectedPersons = new List<PersonInfo>();
+            foreach (DataGridViewRow row in dgvPersonInfo.Rows)
             {
-                MessageBox.Show("请至少选择一行数据进行导出", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (row.DataBoundItem is PersonInfo person && person.IsSelected)
+                {
+                    selectedPersons.Add(person);
+                }
+            }
+
+            if (selectedPersons.Count == 0)
+            {
+                MessageBox.Show("请至少勾选一条数据进行导出", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -407,16 +642,6 @@ namespace WinFormsApp1
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = saveFileDialog.FileName;
-
-                // 收集选中的人员信息
-                List<PersonInfo> selectedPersons = new List<PersonInfo>();
-                foreach (DataGridViewRow row in dgvPersonInfo.SelectedRows)
-                {
-                    if (row.DataBoundItem is PersonInfo person)
-                    {
-                        selectedPersons.Add(person);
-                    }
-                }
 
                 bool result = _dataManager.ExportToExcel(selectedPersons, filePath);
                 if (result)
@@ -539,6 +764,26 @@ namespace WinFormsApp1
                 return;
             }
 
+            foreach (var person in personList)
+            {
+                person.IdCardNumber = person.IdCardNumber.ToUpper();
+            }
+
+            var duplicateIdCards = personList.GroupBy(p => p.IdCardNumber)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            var duplicateBankCards = personList.GroupBy(p => p.BankCardNumber)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            var duplicatePhones = personList.GroupBy(p => p.PhoneNumber)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
             List<string> errorMessages = new List<string>();
             int errorCount = 0;
             int checkedCount = 0;
@@ -552,15 +797,27 @@ namespace WinFormsApp1
                 {
                     personErrors.Add($"身份证号码格式错误（应为18位）: {person.IdCardNumber}");
                 }
+                else if (duplicateIdCards.Contains(person.IdCardNumber))
+                {
+                    personErrors.Add($"身份证号码重复: {person.IdCardNumber}");
+                }
 
                 if (!ValidationHelper.ValidateBankCardNumber(person.BankCardNumber))
                 {
                     personErrors.Add($"银行卡号码格式错误（应为13-19位数字）: {person.BankCardNumber}");
                 }
+                else if (duplicateBankCards.Contains(person.BankCardNumber))
+                {
+                    personErrors.Add($"银行卡号码重复: {person.BankCardNumber}");
+                }
 
                 if (!ValidationHelper.ValidatePhoneNumber(person.PhoneNumber))
                 {
                     personErrors.Add($"电话号码格式错误（应为11位且以1开头）: {person.PhoneNumber}");
+                }
+                else if (duplicatePhones.Contains(person.PhoneNumber))
+                {
+                    personErrors.Add($"电话号码重复: {person.PhoneNumber}");
                 }
 
                 if (personErrors.Count > 0)
@@ -572,7 +829,7 @@ namespace WinFormsApp1
 
             if (errorCount == 0)
             {
-                MessageBox.Show($"检查完成！\n共检查 {checkedCount} 条记录，全部格式正确。", "检查结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"检查完成！\n共检查 {checkedCount} 条记录，全部格式正确且无重复。", "检查结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {

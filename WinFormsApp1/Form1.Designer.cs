@@ -48,6 +48,7 @@ namespace WinFormsApp1
             btnDelete = new Button();
             btnClear = new Button();
             dgvPersonInfo = new DataGridView();
+            SelectCheckBoxColumn = new DataGridViewCheckBoxColumn();
             NameColumn = new DataGridViewTextBoxColumn();
             GenderColumn = new DataGridViewTextBoxColumn();
             IdCardColumn = new DataGridViewTextBoxColumn();
@@ -242,7 +243,7 @@ namespace WinFormsApp1
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             dgvPersonInfo.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvPersonInfo.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPersonInfo.Columns.AddRange(new DataGridViewColumn[] { NameColumn, GenderColumn, IdCardColumn, BankNameColumn, BankCardColumn, PhoneColumn, CreatedTimeColumn, LastModifiedColumn });
+            dgvPersonInfo.Columns.AddRange(new DataGridViewColumn[] { SelectCheckBoxColumn, NameColumn, GenderColumn, IdCardColumn, BankNameColumn, BankCardColumn, PhoneColumn, CreatedTimeColumn, LastModifiedColumn });
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = SystemColors.Window;
             dataGridViewCellStyle2.Font = new Font("Microsoft YaHei UI", 9F);
@@ -251,10 +252,10 @@ namespace WinFormsApp1
             dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
             dgvPersonInfo.DefaultCellStyle = dataGridViewCellStyle2;
-            dgvPersonInfo.Location = new Point(9, 280);
+            dgvPersonInfo.Location = new Point(9, 356);
             dgvPersonInfo.Margin = new Padding(2, 3, 2, 3);
             dgvPersonInfo.Name = "dgvPersonInfo";
-            dgvPersonInfo.ReadOnly = true;
+            dgvPersonInfo.ReadOnly = false;
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = SystemColors.Control;
             dataGridViewCellStyle3.Font = new Font("Microsoft YaHei UI", 9F);
@@ -269,6 +270,17 @@ namespace WinFormsApp1
             dgvPersonInfo.Size = new Size(1275, 506);
             dgvPersonInfo.TabIndex = 12;
             dgvPersonInfo.CellClick += dgvPersonInfo_CellClick;
+            // 
+            // SelectCheckBoxColumn
+            // 
+            SelectCheckBoxColumn.DataPropertyName = "IsSelected";
+            SelectCheckBoxColumn.HeaderText = "选择";
+            SelectCheckBoxColumn.Name = "SelectCheckBoxColumn";
+            SelectCheckBoxColumn.Width = 50;
+            SelectCheckBoxColumn.TrueValue = true;
+            SelectCheckBoxColumn.FalseValue = false;
+            SelectCheckBoxColumn.IndeterminateValue = false;
+            SelectCheckBoxColumn.ReadOnly = false;
             // 
             // NameColumn
             // 
@@ -407,10 +419,10 @@ namespace WinFormsApp1
             panel1.Controls.Add(txtPhone);
             panel1.Controls.Add(txtIdCard);
             panel1.Controls.Add(txtBankCard);
-            panel1.Location = new Point(9, 12);
+            panel1.Location = new Point(9, 60);
             panel1.Margin = new Padding(2, 3, 2, 3);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1276, 230);
+            panel1.Size = new Size(1276, 260);
             panel1.TabIndex = 15;
             panel1.Paint += panel1_Paint;
             // 
@@ -458,7 +470,7 @@ namespace WinFormsApp1
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(txtSearch);
             panel2.Controls.Add(label6);
-            panel2.Location = new Point(9, 248);
+            panel2.Location = new Point(9, 330);
             panel2.Margin = new Padding(2, 3, 2, 3);
             panel2.Name = "panel2";
             panel2.Size = new Size(1276, 26);
@@ -495,7 +507,7 @@ namespace WinFormsApp1
             Margin = new Padding(2, 3, 2, 3);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "个人信息管理系统";
+            Text = "WorkData - 个人信息管理";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)dgvPersonInfo).EndInit();
             statusStrip1.ResumeLayout(false);
@@ -527,6 +539,7 @@ namespace WinFormsApp1
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.Button btnExportExcel;
         private System.Windows.Forms.DataGridView dgvPersonInfo;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn SelectCheckBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn NameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn GenderColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdCardColumn;

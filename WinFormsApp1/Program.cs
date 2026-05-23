@@ -30,6 +30,18 @@ namespace WinFormsApp1
         {
             InitializeComponent();
             _salaryDataManager = new SalaryDataManager();
+            
+            try
+            {
+                string iconPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico");
+                if (System.IO.File.Exists(iconPath))
+                {
+                    this.Icon = new Icon(iconPath);
+                }
+            }
+            catch
+            {
+            }
         }
 
         private void InitializeComponent()
@@ -53,6 +65,7 @@ namespace WinFormsApp1
             this.label5 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lblTotalAmount = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSalary)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -62,17 +75,19 @@ namespace WinFormsApp1
             // 
             this.dgvSalary.AllowUserToAddRows = false;
             this.dgvSalary.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvSalary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvSalary.Location = new System.Drawing.Point(0, 0);
+            this.dgvSalary.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvSalary.Location = new System.Drawing.Point(0, 35);
             this.dgvSalary.Name = "dgvSalary";
-            this.dgvSalary.Size = new System.Drawing.Size(800, 400);
+            this.dgvSalary.Size = new System.Drawing.Size(900, 465);
             this.dgvSalary.TabIndex = 0;
             // 
             // btnImportExcel
             // 
-            this.btnImportExcel.Location = new System.Drawing.Point(12, 12);
+            this.btnImportExcel.Location = new System.Drawing.Point(12, 10);
             this.btnImportExcel.Name = "btnImportExcel";
-            this.btnImportExcel.Size = new System.Drawing.Size(100, 30);
+            this.btnImportExcel.Size = new System.Drawing.Size(100, 35);
             this.btnImportExcel.TabIndex = 1;
             this.btnImportExcel.Text = "导入Excel";
             this.btnImportExcel.UseVisualStyleBackColor = true;
@@ -80,16 +95,16 @@ namespace WinFormsApp1
             // 
             // btnExportExcel
             // 
-            this.btnExportExcel.Location = new System.Drawing.Point(118, 12);
+            this.btnExportExcel.Location = new System.Drawing.Point(12, 55);
             this.btnExportExcel.Name = "btnExportExcel";
-            this.btnExportExcel.Size = new System.Drawing.Size(100, 30);
+            this.btnExportExcel.Size = new System.Drawing.Size(100, 35);
             this.btnExportExcel.TabIndex = 2;
             this.btnExportExcel.Text = "导出Excel";
             this.btnExportExcel.UseVisualStyleBackColor = true;
             this.btnExportExcel.Click += new System.EventHandler(this.btnExportExcel_Click);
-            this.btnGenerateTemplate.Location = new System.Drawing.Point(12, 48);
+            this.btnGenerateTemplate.Location = new System.Drawing.Point(130, 10);
             this.btnGenerateTemplate.Name = "btnGenerateTemplate";
-            this.btnGenerateTemplate.Size = new System.Drawing.Size(100, 30);
+            this.btnGenerateTemplate.Size = new System.Drawing.Size(100, 35);
             this.btnGenerateTemplate.TabIndex = 8;
             this.btnGenerateTemplate.Text = "生成模板";
             this.btnGenerateTemplate.UseVisualStyleBackColor = true;
@@ -97,7 +112,7 @@ namespace WinFormsApp1
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(664, 20);
+            this.btnSearch.Location = new System.Drawing.Point(750, 35);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(60, 30);
             this.btnSearch.TabIndex = 3;
@@ -107,16 +122,16 @@ namespace WinFormsApp1
             // 
             // btnResetFilter
             // 
-            this.btnResetFilter.Location = new System.Drawing.Point(730, 20);
+            this.btnResetFilter.Location = new System.Drawing.Point(820, 35);
             this.btnResetFilter.Name = "btnResetFilter";
             this.btnResetFilter.Size = new System.Drawing.Size(60, 30);
             this.btnResetFilter.TabIndex = 4;
             this.btnResetFilter.Text = "重置";
             this.btnResetFilter.UseVisualStyleBackColor = true;
             this.btnResetFilter.Click += new System.EventHandler(this.btnResetFilter_Click);
-            this.btnClearConditions.Location = new System.Drawing.Point(118, 48);
+            this.btnClearConditions.Location = new System.Drawing.Point(130, 55);
             this.btnClearConditions.Name = "btnClearConditions";
-            this.btnClearConditions.Size = new System.Drawing.Size(100, 30);
+            this.btnClearConditions.Size = new System.Drawing.Size(100, 35);
             this.btnClearConditions.TabIndex = 9;
             this.btnClearConditions.Text = "清除条件";
             this.btnClearConditions.UseVisualStyleBackColor = true;
@@ -124,9 +139,9 @@ namespace WinFormsApp1
             // 
             // txtNameFilter
             // 
-            this.txtNameFilter.Location = new System.Drawing.Point(224, 17);
+            this.txtNameFilter.Location = new System.Drawing.Point(250, 35);
             this.txtNameFilter.Name = "txtNameFilter";
-            this.txtNameFilter.Size = new System.Drawing.Size(100, 21);
+            this.txtNameFilter.Size = new System.Drawing.Size(120, 21);
             this.txtNameFilter.TabIndex = 5;
             this.txtNameFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
             this.txtNameFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
@@ -134,9 +149,9 @@ namespace WinFormsApp1
             // 
             // txtUnitFilter
             // 
-            this.txtUnitFilter.Location = new System.Drawing.Point(374, 17);
+            this.txtUnitFilter.Location = new System.Drawing.Point(420, 35);
             this.txtUnitFilter.Name = "txtUnitFilter";
-            this.txtUnitFilter.Size = new System.Drawing.Size(100, 21);
+            this.txtUnitFilter.Size = new System.Drawing.Size(120, 21);
             this.txtUnitFilter.TabIndex = 6;
             this.txtUnitFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
             this.txtUnitFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
@@ -144,9 +159,9 @@ namespace WinFormsApp1
             // 
             // txtMonthFilter
             // 
-            this.txtMonthFilter.Location = new System.Drawing.Point(524, 17);
+            this.txtMonthFilter.Location = new System.Drawing.Point(600, 35);
             this.txtMonthFilter.Name = "txtMonthFilter";
-            this.txtMonthFilter.Size = new System.Drawing.Size(70, 21);
+            this.txtMonthFilter.Size = new System.Drawing.Size(120, 21);
             this.txtMonthFilter.TabIndex = 7;
             this.txtMonthFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
             this.txtMonthFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
@@ -154,24 +169,24 @@ namespace WinFormsApp1
             // 
             // datePickerStartDate
             // 
-            this.datePickerStartDate.Location = new System.Drawing.Point(224, 80);
+            this.datePickerStartDate.Location = new System.Drawing.Point(250, 75);
             this.datePickerStartDate.Name = "datePickerStartDate";
-            this.datePickerStartDate.Size = new System.Drawing.Size(150, 20);
+            this.datePickerStartDate.Size = new System.Drawing.Size(150, 21);
             this.datePickerStartDate.TabIndex = 8;
             this.datePickerStartDate.Checked = false;
             // 
             // datePickerEndDate
             // 
-            this.datePickerEndDate.Location = new System.Drawing.Point(424, 80);
+            this.datePickerEndDate.Location = new System.Drawing.Point(470, 75);
             this.datePickerEndDate.Name = "datePickerEndDate";
-            this.datePickerEndDate.Size = new System.Drawing.Size(150, 20);
+            this.datePickerEndDate.Size = new System.Drawing.Size(150, 21);
             this.datePickerEndDate.TabIndex = 9;
             this.datePickerEndDate.Checked = false;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(221, 1);
+            this.label1.Location = new System.Drawing.Point(250, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(29, 13);
             this.label1.TabIndex = 10;
@@ -180,7 +195,7 @@ namespace WinFormsApp1
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(371, 1);
+            this.label2.Location = new System.Drawing.Point(420, 15);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 13);
             this.label2.TabIndex = 11;
@@ -189,7 +204,7 @@ namespace WinFormsApp1
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(521, 1);
+            this.label3.Location = new System.Drawing.Point(600, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(35, 13);
             this.label3.TabIndex = 12;
@@ -198,20 +213,20 @@ namespace WinFormsApp1
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(221, 64);
+            this.label4.Location = new System.Drawing.Point(250, 60);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(65, 13);
+            this.label4.Size = new System.Drawing.Size(55, 13);
             this.label4.TabIndex = 13;
-            this.label4.Text = "开始发放时间";
+            this.label4.Text = "开始日期";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(421, 64);
+            this.label5.Location = new System.Drawing.Point(470, 60);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(65, 13);
+            this.label5.Size = new System.Drawing.Size(55, 13);
             this.label5.TabIndex = 14;
-            this.label5.Text = "结束发放时间";
+            this.label5.Text = "结束日期";
             // 
             // panel1
             // 
@@ -232,27 +247,40 @@ namespace WinFormsApp1
             this.panel1.Controls.Add(this.btnImportExcel);
             this.panel1.Controls.Add(this.btnGenerateTemplate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 100);
+            this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(800, 120);
+            this.panel1.Size = new System.Drawing.Size(900, 100);
             this.panel1.TabIndex = 15;
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.lblTotalAmount);
             this.panel2.Controls.Add(this.dgvSalary);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 220);
+            this.panel2.Location = new System.Drawing.Point(0, 100);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(800, 230);
+            this.panel2.Size = new System.Drawing.Size(900, 500);
             this.panel2.TabIndex = 16;
+            // 
+            // lblTotalAmount
+            // 
+            this.lblTotalAmount.AutoSize = true;
+            this.lblTotalAmount.BackColor = System.Drawing.Color.LightYellow;
+            this.lblTotalAmount.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblTotalAmount.ForeColor = System.Drawing.Color.DarkRed;
+            this.lblTotalAmount.Location = new System.Drawing.Point(10, 10);
+            this.lblTotalAmount.Name = "lblTotalAmount";
+            this.lblTotalAmount.Size = new System.Drawing.Size(150, 20);
+            this.lblTotalAmount.TabIndex = 17;
+            this.lblTotalAmount.Text = "选中记录总金额：0 元";
             // 
             // SalaryForm
             // 
-            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.ClientSize = new System.Drawing.Size(900, 600);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Name = "SalaryForm";
-            this.Text = "薪资信息管理";
+            this.Text = "WorkData - 薪资信息管理";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.SalaryForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSalary)).EndInit();
@@ -271,7 +299,6 @@ namespace WinFormsApp1
 
         private void InitializeDataGridView()
         {
-            // 设置DataGridView的列
             dgvSalary.Columns.Clear();
             
             dgvSalary.AutoGenerateColumns = false;
@@ -279,15 +306,32 @@ namespace WinFormsApp1
             dgvSalary.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvSalary.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             
-            // 添加列
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "姓名", FillWeight = 100 });
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Month", HeaderText = "月份", FillWeight = 80 });
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SalaryAmount", HeaderText = "当月工资金额", FillWeight = 100, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N0" } });
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "PayrollUnit", HeaderText = "发放单位", FillWeight = 120 });
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CreateTime", HeaderText = "制表时间", FillWeight = 150, DefaultCellStyle = new DataGridViewCellStyle() { Format = "yyyy-MM-dd HH:mm:ss" } });
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "PaymentTime", HeaderText = "发放时间", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "yyyy-MM-dd" } });
-            // 添加发放总金额列
-            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "TotalSalary", HeaderText = "发放总金额", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N0", BackColor = Color.LightYellow } });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", DataPropertyName = "Name", HeaderText = "姓名", FillWeight = 100 });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "Month", DataPropertyName = "Month", HeaderText = "月份", FillWeight = 80 });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "SalaryAmount", DataPropertyName = "SalaryAmount", HeaderText = "当月发放金额", FillWeight = 100, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N0" } });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "PayrollUnit", DataPropertyName = "PayrollUnit", HeaderText = "发放单位", FillWeight = 120 });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "CreateTime", DataPropertyName = "CreateTime", HeaderText = "制表时间", FillWeight = 150, DefaultCellStyle = new DataGridViewCellStyle() { Format = "yyyy-MM-dd HH:mm:ss" } });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "PaymentTime", DataPropertyName = "PaymentTime", HeaderText = "发放时间", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "yyyy-MM-dd" } });
+            dgvSalary.Columns.Add(new DataGridViewTextBoxColumn { Name = "TotalSalary", DataPropertyName = "TotalSalary", HeaderText = "发放总金额", FillWeight = 120, DefaultCellStyle = new DataGridViewCellStyle() { Format = "N0", BackColor = Color.LightYellow } });
+        }
+
+        private void UpdateTotalAmount()
+        {
+            decimal totalAmount = 0;
+            
+            foreach (DataGridViewRow row in dgvSalary.Rows)
+            {
+                if (row.Cells["SalaryAmount"].Value != null)
+                {
+                    decimal salaryAmount;
+                    if (decimal.TryParse(row.Cells["SalaryAmount"].Value.ToString(), out salaryAmount))
+                    {
+                        totalAmount += salaryAmount;
+                    }
+                }
+            }
+            
+            lblTotalAmount.Text = $"选中记录总金额：{totalAmount:N0} 元";
         }
 
         private void LoadSalaryData()
@@ -466,6 +510,8 @@ namespace WinFormsApp1
             }).OrderBy(s => s.Month).ThenBy(s => s.Name).ToList();
             
             dgvSalary.DataSource = dataWithTotals;
+            
+            UpdateTotalAmount();
         }
         
         private void btnResetFilter_Click(object sender, EventArgs e)
@@ -592,5 +638,6 @@ namespace WinFormsApp1
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label lblTotalAmount;
     }
 }

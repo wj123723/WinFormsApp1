@@ -15,6 +15,7 @@ namespace WinFormsApp1
     {
         private readonly string _personFilePath;
         private readonly string _salaryFilePath;
+        private readonly string _incomeRecordFilePath;
         private readonly JsonSerializerOptions _jsonOptions;
 
         /// <summary>
@@ -31,6 +32,7 @@ namespace WinFormsApp1
             
             _personFilePath = Path.Combine(appFolderPath, "person_info.json");
             _salaryFilePath = Path.Combine(appFolderPath, "salary_info.json");
+            _incomeRecordFilePath = Path.Combine(appFolderPath, "income_records.json");
             
             // 配置JSON序列化选项
             _jsonOptions = new JsonSerializerOptions
@@ -393,6 +395,122 @@ namespace WinFormsApp1
                 return false;
             }
         }
+
+        public List<PersonalIncomeRecord> LoadIncomeRecords()
+        {
+            try
+            {
+                if (!File.Exists(_incomeRecordFilePath))
+                {
+                    return new List<PersonalIncomeRecord>();
+                }
+
+                string jsonString = File.ReadAllText(_incomeRecordFilePath);
+                return JsonSerializer.Deserialize<List<PersonalIncomeRecord>>(jsonString, _jsonOptions) 
+                    ?? new List<PersonalIncomeRecord>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("加载收入记录失败: " + ex.Message);
+                return new List<PersonalIncomeRecord>();
+            }
+        }
+
+        public void SaveIncomeRecords(List<PersonalIncomeRecord> records)
+        {
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(records, _jsonOptions);
+                File.WriteAllText(_incomeRecordFilePath, jsonString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("保存收入记录失败: " + ex.Message);
+                throw;
+            }
+        }
+
+        public void AddIncomeRecord(PersonalIncomeRecord record)
+        {
+            var records = LoadIncomeRecords();
+            record.Id = records.Count > 0 ? records.Max(r => r.Id) + 1 : 1;
+            records.Add(record);
+            SaveIncomeRecords(records);
+        }
+
+        public void UpdateIncomeRecord(PersonalIncomeRecord record)
+        {
+            var records = LoadIncomeRecords();
+            var existingRecord = records.FirstOrDefault(r => r.Id == record.Id);
+            if (existingRecord != null)
+            {
+                int index = records.IndexOf(existingRecord);
+                records[index] = record;
+                SaveIncomeRecords(records);
+            }
+        }
+
+        public void DeleteIncomeRecord(int recordId)
+        {
+            var records = LoadIncomeRecords();
+            records.RemoveAll(r => r.Id == recordId);
+            SaveIncomeRecords(records);
+        }
+
+        public List<PersonalIncomeRecord> GetIncomeRecordsByPerson(string personName)
+        {
+            var allRecords = LoadIncomeRecords();
+            return allRecords.Where(r => r.PersonName == personName).OrderByDescending(r => r.RecordTime).ToList();
+        }
+
+        public void SyncSalaryToIncomeRecords()
+        {
+            try
+            {
+                var salaryData = LoadSalaryData();
+                var incomeRecords = LoadIncomeRecords();
+                
+                int syncedCount = 0;
+                
+                foreach (var salary in salaryData)
+                {
+                    string expectedRemark = $"{salary.Month} {salary.PayrollUnit}";
+                    
+                    bool exists = incomeRecords.Any(r => 
+                        r.PersonName == salary.Name && 
+                        r.RecordType == "支取" && 
+                        r.Remark == expectedRemark &&
+                        r.Amount == salary.SalaryAmount);
+                    
+                    if (!exists)
+                    {
+                        var incomeRecord = new PersonalIncomeRecord
+                        {
+                            PersonName = salary.Name,
+                            Amount = salary.SalaryAmount,
+                            RecordType = "支取",
+                            Remark = expectedRemark,
+                            RecordTime = salary.PaymentTime ?? salary.CreateTime,
+                            CreateTime = DateTime.Now
+                        };
+                        
+                        incomeRecord.Id = incomeRecords.Count > 0 ? incomeRecords.Max(r => r.Id) + 1 : 1;
+                        incomeRecords.Add(incomeRecord);
+                        syncedCount++;
+                    }
+                }
+                
+                if (syncedCount > 0)
+                {
+                    SaveIncomeRecords(incomeRecords);
+                    Console.WriteLine($"同步完成：新增 {syncedCount} 条收入记录");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("同步薪资数据失败: " + ex.Message);
+            }
+        }
     }
     
     /// <summary>
@@ -416,7 +534,7 @@ namespace WinFormsApp1
         public string Month { get; set; }
 
         /// <summary>
-        /// 当月工资金额
+        /// 当月发放金额
         /// </summary>
         public decimal SalaryAmount { get; set; }
 
@@ -606,6 +724,19 @@ namespace WinFormsApp1
                                 // 添加新记录
                                 existingData.Add(newSalary);
                                 addedCount++;
+                                
+                                // 同步添加个人收入记录（支取）
+                                var dataManager = new personalDataManager();
+                                var incomeRecord = new PersonalIncomeRecord
+                                {
+                                    PersonName = name.Trim(),
+                                    Amount = salaryAmount,
+                                    RecordType = "支取",
+                                    Remark = $"{month.Trim()} {payrollUnit.Trim()}",
+                                    RecordTime = paymentTime ?? DateTime.Now,
+                                    CreateTime = DateTime.Now
+                                };
+                                dataManager.AddIncomeRecord(incomeRecord);
                             }
                         }
                         catch (Exception)
@@ -649,7 +780,7 @@ namespace WinFormsApp1
                 IRow headerRow = sheet.CreateRow(0);
                 headerRow.CreateCell(0).SetCellValue("姓名");
                 headerRow.CreateCell(1).SetCellValue("月份");
-                headerRow.CreateCell(2).SetCellValue("当月工资金额");
+                headerRow.CreateCell(2).SetCellValue("当月发放金额");
                 headerRow.CreateCell(3).SetCellValue("发放单位");
                 headerRow.CreateCell(4).SetCellValue("制表时间");
                 headerRow.CreateCell(5).SetCellValue("发放时间");
@@ -719,7 +850,7 @@ namespace WinFormsApp1
                 IRow headerRow = sheet.CreateRow(0);
                 headerRow.CreateCell(0).SetCellValue("姓名");
                 headerRow.CreateCell(1).SetCellValue("月份");
-                headerRow.CreateCell(2).SetCellValue("当月工资金额");
+                headerRow.CreateCell(2).SetCellValue("当月发放金额");
                 headerRow.CreateCell(3).SetCellValue("发放单位");
                 headerRow.CreateCell(4).SetCellValue("制表时间");
                 headerRow.CreateCell(5).SetCellValue("发放时间");
@@ -841,5 +972,6 @@ namespace WinFormsApp1
                     return string.Empty;
             }
         }
+
     }
 }
